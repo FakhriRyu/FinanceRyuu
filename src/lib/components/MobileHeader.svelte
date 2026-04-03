@@ -55,7 +55,7 @@
                <UserIcon size={24} />
             </div>
             <div class="flex flex-col min-w-0">
-              <p class="text-sm font-black text-slate-900 truncate tracking-tight">{$user.user_metadata?.full_name || $user.email?.split('@')[0]}</p>
+              <p class="text-sm font-black text-slate-900 truncate tracking-tight">{$user.email?.split('@')[0]}</p>
               <p class="text-[10px] text-slate-400 font-bold truncate tracking-wide">{$user.email}</p>
             </div>
           </div>

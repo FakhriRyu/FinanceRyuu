@@ -4,8 +4,10 @@
   import TransactionModal from '$lib/components/TransactionModal.svelte';
   import { getGreeting } from '$lib/utils';
   import { Plus } from 'lucide-svelte';
+  import { user } from '$lib/stores';
 
   let showModal = $state(false);
+  const displayName = $derived($user?.email?.split('@')[0] ?? 'User');
 </script>
 
 <svelte:head>
@@ -16,7 +18,7 @@
   <div class="space-y-1 px-4 pt-6">
     <p class="text-xs lg:text-sm font-bold text-soft-blue-500 uppercase tracking-[0.3em]">{getGreeting()}</p>
     <h1 class="text-3xl lg:text-5xl font-black text-slate-900 tracking-tighter">
-      Fakhri Alwan
+      {displayName}
     </h1>
   </div>
 
