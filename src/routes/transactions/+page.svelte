@@ -183,7 +183,7 @@
 <!-- Floating Action Button -->
 <button 
   onclick={() => (showModal = true)}
-  class="fixed bottom-28 lg:bottom-12 right-6 lg:right-12 w-18 h-18 rounded-[1.5rem] bg-gradient-to-br from-soft-pink-500 to-soft-blue-500 text-white shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 shadow-soft-blue-500/25 hover:shadow-soft-blue-500/40 transition-all z-40 group"
+  class="fixed bottom-36 lg:bottom-12 right-6 lg:right-12 w-18 h-18 rounded-[1.5rem] bg-gradient-to-br from-soft-pink-500 to-soft-blue-500 text-white shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 shadow-soft-blue-500/25 hover:shadow-soft-blue-500/40 transition-all z-40 group"
 >
   <div class="group-hover:rotate-90 transition-transform duration-500">
     <Plus size={32} strokeWidth={3} />

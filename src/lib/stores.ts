@@ -524,8 +524,28 @@ export async function addTransaction(tx: Omit<Transaction, 'id' | 'user_id' | 'c
       created_at: new Date().toISOString()
     };
     transactions.update((t) => [fake, ...t]);
+    // Optimistic wallet balance update
+    if (fake.wallet_id) {
+      wallets.update((ws) => ws.map((w) => {
+        if (w.id === fake.wallet_id) {
+          const change = fake.type === 'income' ? fake.amount : -fake.amount;
+          return { ...w, balance: w.balance + change };
+        }
+        return w;
+      }));
+    }
   } else if (data) {
     transactions.update((t) => [data, ...t]);
+    // Optimistic wallet balance update
+    if (data.wallet_id) {
+      wallets.update((ws) => ws.map((w) => {
+        if (w.id === data.wallet_id) {
+          const change = data.type === 'income' ? data.amount : -data.amount;
+          return { ...w, balance: w.balance + change };
+        }
+        return w;
+      }));
+    }
   }
 
   loading.set(false);
@@ -543,8 +563,20 @@ export async function deleteTransaction(id: string) {
 
   if (err) {
     error.set(err.message);
+  } else {
+    // Optimistic wallet balance update
+    const txToDelete = get(transactions).find(t => t.id === id);
+    if (txToDelete && txToDelete.wallet_id) {
+      wallets.update((ws) => ws.map((w) => {
+        if (w.id === txToDelete.wallet_id) {
+          const change = txToDelete.type === 'income' ? -txToDelete.amount : txToDelete.amount;
+          return { ...w, balance: w.balance + change };
+        }
+        return w;
+      }));
+    }
+    transactions.update((t) => t.filter((tx) => tx.id !== id));
   }
-  transactions.update((t) => t.filter((tx) => tx.id !== id));
 }
 
 // ── Demo Data Generator ──

@@ -74,12 +74,7 @@
           return;
         }
         
-        // 1. Decrease source wallet balance
-        await updateWallet(targetWallet.id, { balance: targetWallet.balance - amount });
-        // 2. Increase savings wallet balance
-        await updateWallet(savingsWallet.id, { balance: savingsWallet.balance + amount });
-
-        // 3. Add Transactions (Both sides)
+        // 1. Add Transactions (Both sides) - These will handle wallet updates locally
         await addTransaction({
           type: 'expense',
           amount: amount,
@@ -103,12 +98,7 @@
           return;
         }
 
-        // 1. Decrease savings wallet balance
-        await updateWallet(savingsWallet.id, { balance: savingsWallet.balance - amount });
-        // 2. Increase target wallet balance
-        await updateWallet(targetWallet.id, { balance: targetWallet.balance + amount });
-
-        // 3. Add Transactions (Both sides)
+        // 1. Add Transactions (Both sides) - These will handle wallet updates locally
         await addTransaction({
           type: 'expense',
           amount: amount,

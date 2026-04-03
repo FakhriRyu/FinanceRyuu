@@ -58,7 +58,7 @@
     <MobileHeader />
 
     <!-- Main content area -->
-    <main class="flex-1 lg:ml-64 pb-24 lg:pb-0 min-h-screen">
+    <main class="flex-1 lg:ml-64 pb-36 lg:pb-0 min-h-screen">
       <div class="p-4 lg:p-8 max-w-7xl mx-auto">
         {@render children()}
       </div>
