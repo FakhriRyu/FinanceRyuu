@@ -1,0 +1,180 @@
+@import 'tailwindcss';
+@import '@skeletonlabs/skeleton';
+@import '@skeletonlabs/skeleton/themes/cerberus';
+
+/* ===== Flat Minimalism Theme - Soft Pink & Blue ===== */
+
+@theme {
+  --color-black: #000000;
+  --color-white: #ffffff;
+  
+  /* Soft Blue palette */
+  --color-soft-blue-50: oklch(0.97 0.01 240);
+  --color-soft-blue-100: oklch(0.94 0.03 240);
+  --color-soft-blue-200: oklch(0.88 0.06 240);
+  --color-soft-blue-300: oklch(0.82 0.08 240);
+  --color-soft-blue-400: oklch(0.75 0.12 240);
+  --color-soft-blue-500: oklch(0.65 0.15 240);
+  --color-soft-blue-600: oklch(0.55 0.15 240);
+  
+  /* Soft Pink palette */
+  --color-soft-pink-50: oklch(0.97 0.01 350);
+  --color-soft-pink-100: oklch(0.94 0.03 350);
+  --color-soft-pink-200: oklch(0.88 0.06 350);
+  --color-soft-pink-300: oklch(0.82 0.08 350);
+  --color-soft-pink-400: oklch(0.75 0.12 350);
+  --color-soft-pink-500: oklch(0.65 0.15 350);
+  --color-soft-pink-600: oklch(0.55 0.15 350);
+
+  /* Neutrals */
+  --color-slate-50: oklch(0.98 0.005 230);
+  --color-slate-100: oklch(0.96 0.01 230);
+  --color-slate-200: oklch(0.92 0.02 230);
+  --color-slate-800: oklch(0.22 0.04 230);
+  --color-slate-900: oklch(0.15 0.03 230);
+  --color-slate-950: oklch(0.10 0.02 230);
+
+  /* Semantic UI Colors */
+  --color-card-bg: #ffffff;
+  --color-card-border: rgba(0, 0, 0, 0.04);
+  --color-text-main: #1e293b;
+  --color-text-muted: #64748b;
+  --color-app-bg: #fcfdfe;
+
+  /* Legacy Ocean Aliases for compatibility during transition */
+  --color-ocean-500: var(--color-soft-blue-500);
+  --color-ocean-600: var(--color-soft-blue-600);
+  --color-ocean-400: var(--color-soft-blue-400);
+
+  /* Font family */
+  --font-sans: 'Inter', 'system-ui', sans-serif;
+
+  /* Animations */
+  --animate-fade-in: fade-in 0.4s ease-out;
+  --animate-slide-up: slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-modal-slide-up: modal-slide-up 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* ===== Keyframes ===== */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes modal-slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* ===== Global styles ===== */
+html {
+  scroll-behavior: smooth;
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-app-bg);
+  color: var(--color-text-main);
+  min-height: 100vh;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Shadow tokens */
+.shadow-soft {
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.03), 0 4px 6px -4px rgba(0, 0, 0, 0.02);
+}
+
+.shadow-soft-lg {
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05), 0 8px 12px -8px rgba(0, 0, 0, 0.03);
+}
+
+/* ===== Flat Surfaces (Replacing Glass) ===== */
+.glass, .glass-card, .glass-strong {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.02);
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.glass-card {
+  border-radius: 2rem;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.06);
+}
+
+/* ===== Buttons ===== */
+.btn-ocean {
+  background: var(--color-soft-blue-500);
+  color: white !important;
+  padding: 0.85rem 1.75rem;
+  border-radius: 1.25rem;
+  font-weight: 700;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 10px 20px -5px oklch(0.65 0.15 240 / 0.2);
+}
+
+.btn-ocean:hover {
+  background: var(--color-soft-blue-600);
+  transform: scale(1.02);
+}
+
+.btn-pink {
+  background: var(--color-soft-pink-500);
+  color: white !important;
+  padding: 0.85rem 1.75rem;
+  border-radius: 1.25rem;
+  font-weight: 700;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 10px 20px -5px oklch(0.65 0.15 350 / 0.2);
+}
+
+.btn-pink:hover {
+  background: var(--color-soft-pink-600);
+  transform: scale(1.02);
+}
+
+/* Form Input */
+.input-ocean {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 0.85rem 1.25rem;
+  color: #1e293b;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.input-ocean:focus {
+  background: white;
+  border-color: var(--color-soft-blue-400);
+  box-shadow: 0 0 0 4px oklch(0.75 0.12 240 / 0.1);
+  outline: none;
+}
+
+/* Component Overrides */
+.stagger > * {
+  animation: slide-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+
+
