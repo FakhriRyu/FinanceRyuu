@@ -2,7 +2,7 @@
   import { transactions, deleteTransaction, wallets } from '$lib/stores';
   import { formatCurrency, formatDate } from '$lib/utils';
   import { CATEGORY_COLORS } from '$lib/types';
-  import type { TransactionType } from '$lib/types';
+  import type { Transaction, TransactionType } from '$lib/types';
   import TransactionModal from '$lib/components/TransactionModal.svelte';
   import MonthlyChart from '$lib/components/MonthlyChart.svelte';
   import { 
@@ -21,9 +21,15 @@
   import ReportDownloadModal from '$lib/components/ReportDownloadModal.svelte';
 
   let showModal = $state(false);
+  let editingTransaction = $state<Transaction | null>(null);
   let showDownloadModal = $state(false);
   let searchQuery = $state('');
   let filterType = $state<TransactionType | 'all'>('all');
+
+  function openEditModal(tx: Transaction) {
+    editingTransaction = tx;
+    showModal = true;
+  }
 
   const filteredTransactions = $derived(
     $transactions.filter((tx) => {
@@ -117,8 +123,11 @@
         <h2 class="text-xl font-black text-slate-900 px-2 tracking-tight">{month.split(' ')[0]}</h2>
         <div class="space-y-4">
           {#each txs as tx, i}
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
-              class="bg-white p-5 rounded-[2rem] border border-black/5 shadow-soft flex items-center justify-between gap-6 group hover:shadow-soft-lg transition-all duration-300 relative overflow-hidden"
+              onclick={() => openEditModal(tx)}
+              class="bg-white p-5 rounded-[2rem] border border-black/5 shadow-soft flex items-center justify-between gap-6 group hover:shadow-soft-lg transition-all duration-300 relative overflow-hidden cursor-pointer active:scale-[0.98]"
               style="animation: slide-up 0.4s ease-out {Math.min(i * 0.05, 0.5)}s both;"
             >
               <!-- Icon/Logo -->
@@ -150,7 +159,10 @@
               <!-- Actions (Absolute Hidden Menu) -->
               <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all flex gap-1 pointer-events-none group-hover:pointer-events-auto">
                 <button
-                  onclick={() => tx.id && deleteTransaction(tx.id)}
+                  onclick={(e) => {
+                    e.stopPropagation();
+                    tx.id && deleteTransaction(tx.id);
+                  }}
                   class="p-3 rounded-2xl bg-slate-50 text-slate-400 hover:text-soft-pink-500 hover:bg-soft-pink-50 transition-all shadow-sm"
                 >
                   <Trash2 size={18} />
@@ -174,7 +186,7 @@
   </div>
 </div>
 
-<TransactionModal bind:show={showModal} />
+<TransactionModal bind:show={showModal} bind:editingTransaction={editingTransaction} />
 
 {#if showDownloadModal}
   <ReportDownloadModal bind:show={showDownloadModal} />
@@ -182,7 +194,10 @@
 
 <!-- Floating Action Button -->
 <button 
-  onclick={() => (showModal = true)}
+  onclick={() => {
+    editingTransaction = null;
+    showModal = true;
+  }}
   class="fixed bottom-36 lg:bottom-12 right-6 lg:right-12 w-18 h-18 rounded-[1.5rem] bg-gradient-to-br from-soft-pink-500 to-soft-blue-500 text-white shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 shadow-soft-blue-500/25 hover:shadow-soft-blue-500/40 transition-all z-40 group"
 >
   <div class="group-hover:rotate-90 transition-transform duration-500">

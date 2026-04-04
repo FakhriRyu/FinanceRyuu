@@ -5,8 +5,10 @@
   import { getGreeting } from '$lib/utils';
   import { Plus } from 'lucide-svelte';
   import { user } from '$lib/stores';
+  import type { Transaction } from '$lib/types';
 
   let showModal = $state(false);
+  let editingTransaction = $state<Transaction | null>(null);
   const displayName = $derived($user?.email?.split('@')[0] ?? 'User');
 </script>
 
@@ -29,7 +31,7 @@
   <Insights />
 </div>
 
-<TransactionModal bind:show={showModal} />
+<TransactionModal bind:show={showModal} bind:editingTransaction={editingTransaction} />
 
 <!-- Floating Action Button -->
 <button 

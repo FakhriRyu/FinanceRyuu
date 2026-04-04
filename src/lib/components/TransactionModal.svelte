@@ -1,12 +1,15 @@
 <script lang="ts">
-  import { addTransaction, wallets, fetchWallets } from '$lib/stores';
+  import { addTransaction, updateTransaction, wallets, fetchWallets } from '$lib/stores';
   import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '$lib/types';
-  import type { TransactionType } from '$lib/types';
-  import { X, Plus, Wallet as WalletIcon } from 'lucide-svelte';
+  import type { Transaction, TransactionType } from '$lib/types';
+  import { X, Plus, Wallet as WalletIcon, Save } from 'lucide-svelte';
   import { format } from 'date-fns';
   import { onMount } from 'svelte';
 
-  let { show = $bindable(false) } = $props();
+  let { 
+    show = $bindable(false), 
+    editingTransaction = $bindable<Transaction | null>(null)
+  } = $props();
 
   let type = $state<TransactionType>('expense');
   let amount = $state('');
@@ -22,10 +25,35 @@
     if ($wallets.length === 0) fetchWallets();
   });
 
-  // Reset category when type changes
+  // Reset form when editingTransaction changes
   $effect(() => {
-    type;
-    category = '';
+    if (editingTransaction) {
+      type = editingTransaction.type;
+      amount = editingTransaction.amount.toString();
+      category = editingTransaction.category;
+      description = editingTransaction.description;
+      date = editingTransaction.date;
+      wallet_id = editingTransaction.wallet_id || '';
+    } else {
+      // Don't reset everything while closing to avoid flash, but reset when opened for new
+      if (show && !editingTransaction) {
+        type = 'expense';
+        amount = '';
+        category = '';
+        description = '';
+        date = format(new Date(), 'yyyy-MM-dd');
+        wallet_id = '';
+      }
+    }
+  });
+
+  // Reset category when type changes, but NOT when initializing from editingTransaction
+  let lastType = $state<TransactionType | null>(null);
+  $effect(() => {
+    if (lastType !== null && lastType !== type && !editingTransaction) {
+      category = '';
+    }
+    lastType = type;
   });
 
   async function handleSubmit(e: Event) {
@@ -33,14 +61,20 @@
     if (!amount || !category || !description) return;
 
     submitting = true;
-    await addTransaction({
+    const txData = {
       type,
       amount: parseFloat(amount),
       category,
       description,
       date,
       wallet_id: wallet_id || undefined
-    });
+    };
+
+    if (editingTransaction?.id) {
+      await updateTransaction(editingTransaction.id, txData);
+    } else {
+      await addTransaction(txData);
+    }
 
     // Reset form
     amount = '';
@@ -49,11 +83,13 @@
     wallet_id = '';
     date = format(new Date(), 'yyyy-MM-dd');
     submitting = false;
+    editingTransaction = null;
     show = false;
   }
 
   function close() {
     show = false;
+    editingTransaction = null;
   }
 
   $effect(() => {
@@ -88,7 +124,9 @@
 
       <!-- Header -->
       <div class="flex items-center justify-between mb-8">
-        <h2 class="text-xl font-black text-slate-900 tracking-tight">Tambah Transaksi</h2>
+        <h2 class="text-xl font-black text-slate-900 tracking-tight">
+          {editingTransaction ? 'Ubah Transaksi' : 'Tambah Transaksi'}
+        </h2>
         <button onclick={close} class="p-2 rounded-xl text-slate-300 hover:bg-slate-50 hover:text-slate-900 transition-all">
           <X class="w-6 h-6" />
         </button>
@@ -199,8 +237,13 @@
             <span class="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin"></span>
             Menyimpan...
           {:else}
-            <Plus class="w-5 h-5 stroke-[2.5]" />
-            Simpan Transaksi
+            {#if editingTransaction}
+              <Save class="w-5 h-5 stroke-[2.5]" />
+              Update Transaksi
+            {:else}
+              <Plus class="w-5 h-5 stroke-[2.5]" />
+              Simpan Transaksi
+            {/if}
           {/if}
         </button>
       </form>

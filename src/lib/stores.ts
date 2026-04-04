@@ -579,6 +579,73 @@ export async function deleteTransaction(id: string) {
   }
 }
 
+export async function updateTransaction(id: string, tx: Omit<Transaction, 'id' | 'user_id' | 'created_at'>) {
+  loading.set(true);
+  const currentUser = get(user);
+  
+  if (!currentUser) {
+    error.set('Harus login dahulu');
+    loading.set(false);
+    return;
+  }
+
+  // Find original transaction for wallet balance adjustment
+  const originalTx = get(transactions).find(t => t.id === id);
+
+  const { data, error: err } = await supabase
+    .from('transactions')
+    .update({ ...tx, user_id: currentUser.id })
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (err) {
+    error.set(err.message);
+  } else if (data) {
+    transactions.update((t) => t.map((tx) => tx.id === id ? data : tx));
+    
+    // Wallet balance adjustment if wallet_id or amount/type changed
+    if (originalTx) {
+      const oldWalletId = originalTx.wallet_id;
+      const newWalletId = data.wallet_id;
+      
+      // If same wallet, adjust based on difference
+      if (oldWalletId === newWalletId && oldWalletId) {
+        wallets.update((ws) => ws.map((w) => {
+          if (w.id === oldWalletId) {
+            const oldChange = originalTx.type === 'income' ? originalTx.amount : -originalTx.amount;
+            const newChange = data.type === 'income' ? data.amount : -data.amount;
+            return { ...w, balance: w.balance - oldChange + newChange };
+          }
+          return w;
+        }));
+      } else {
+        // If wallet changed, reverse old and apply new
+        if (oldWalletId) {
+          wallets.update((ws) => ws.map((w) => {
+            if (w.id === oldWalletId) {
+              const oldChange = originalTx.type === 'income' ? originalTx.amount : -originalTx.amount;
+              return { ...w, balance: w.balance - oldChange };
+            }
+            return w;
+          }));
+        }
+        if (newWalletId) {
+          wallets.update((ws) => ws.map((w) => {
+            if (w.id === newWalletId) {
+              const newChange = data.type === 'income' ? data.amount : -data.amount;
+              return { ...w, balance: w.balance + newChange };
+            }
+            return w;
+          }));
+        }
+      }
+    }
+  }
+
+  loading.set(false);
+}
+
 // ── Demo Data Generator ──
 function generateDemoData(): Transaction[] {
   const now = new Date();
